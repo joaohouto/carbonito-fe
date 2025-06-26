@@ -264,7 +264,7 @@ export default function HomePage() {
               disabled={isLoading}
             />
             <Button
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage()}
               disabled={isLoading || input.trim() === ""}
               size="icon"
               className="absolute right-4 bottom-3  bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600"
