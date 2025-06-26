@@ -16,6 +16,20 @@ interface Message {
   text: string;
 }
 
+// Novo componente para a animação de digitação
+const TypingDots = () => {
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length < 3 ? prev + "." : ""));
+    }, 300); // Muda a cada 300ms
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span>{dots}</span>;
+};
+
 export default function HomePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
@@ -100,7 +114,7 @@ export default function HomePage() {
       {/* Cabeçalho Fixo */}
       <header className="flex h-16 items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <h1 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-          <Leaf className="h-6 w-6 text-green-600" /> Carbonito
+          <Leaf className="h-6 w-6 text-lime-600" /> Carbonito
         </h1>
       </header>
 
@@ -112,27 +126,28 @@ export default function HomePage() {
         <div className="space-y-6">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-16rem)] text-gray-500 dark:text-gray-400 text-center px-4">
-              <p className="text-lg font-medium">
-                Olá! Sou o **Carbonito**, seu especialista em **legislação
-                ambiental**, **Pantanal** e **mercado de carbono**.
+              <p className="text-lg font-medium text-balance">
+                Olá! Sou o <b>Carbonito</b>, seu especialista em legislação
+                ambiental, Pantanal e mercado de carbono.
               </p>
               <p className="text-md mt-4">Como posso te ajudar hoje?</p>
               <div className="mt-6 space-y-2 text-sm text-gray-600 dark:text-gray-400">
                 <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  Quais são as últimas leis sobre desmatamento no Pantanal?
+                  O que é carbono e por que estão pagando por isso?
                 </p>
                 <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  Explique o conceito de créditos de carbono no agronegócio.
+                  Sou produtor, e agora? Posso entrar nesse mercado?
                 </p>
                 <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  Como a PEC da Transição Ecológica impacta empresas?
+                  O Pantanal vale mais preservado?
                 </p>
               </div>
 
               <p className="text-sm mt-8 text-red-500 dark:text-red-400 font-medium">
-                🚨 Aviso: O Carbonito pode errar em suas respostas, pois às
-                vezes acaba a água do seu tereré. Por isso, é bom checar as
-                respostas em outra fonte.
+                🚨
+                <br /> O Carbonito pode errar em suas respostas, pois às vezes
+                acaba a água do seu tereré. Por isso, é bom checar as respostas
+                em outra fonte.
               </p>
             </div>
           ) : (
@@ -149,15 +164,15 @@ export default function HomePage() {
                       src="/carbonito-avatar.png"
                       alt="Carbonito Avatar"
                     />
-                    <AvatarFallback className="bg-green-500 text-white">
-                      CB
+                    <AvatarFallback className="bg-lime-800 text-white">
+                      <Leaf />
                     </AvatarFallback>
                   </Avatar>
                 )}
                 <div
                   className={`max-w-[70%] p-4 rounded-xl shadow-sm ${
                     message.sender === "user"
-                      ? "bg-blue-600 text-white" // Mudado de 'bg-primary' para 'bg-blue-600' para clareza Tailwind
+                      ? "bg-blue-600 text-white"
                       : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white prose dark:prose-invert"
                   }`}
                 >
@@ -180,6 +195,24 @@ export default function HomePage() {
               </div>
             ))
           )}
+
+          {isLoading && (
+            <div className="flex justify-start items-center mt-2 pl-2">
+              <Avatar className="h-6 w-6 mr-2">
+                <AvatarImage
+                  src="/carbonito-avatar.png"
+                  alt="Carbonito Avatar"
+                />
+                <AvatarFallback className="bg-lime-800 text-white text-xs">
+                  <Leaf className="size-4" />
+                </AvatarFallback>
+              </Avatar>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Carbonito está digitando
+                <TypingDots />
+              </p>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
       </main>
@@ -187,8 +220,6 @@ export default function HomePage() {
       {/* Área de Input Fixa na parte inferior */}
       <div className="flex flex-col items-center relative w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="mx-auto w-full max-w-3xl px-4 py-4 sm:px-6 md:py-6">
-          {" "}
-          {/* Corrigido: md:w-3xl para max-w-3xl */}
           <div className="relative flex items-center w-full">
             <Textarea
               placeholder="Pergunte ao Carbonito..."
@@ -202,7 +233,7 @@ export default function HomePage() {
               onClick={handleSendMessage}
               disabled={isLoading || input.trim() === ""}
               size="icon"
-              className="absolute right-4 bottom-3 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" // Adicionei cores explícitas para o botão
+              className="absolute right-4 bottom-3 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
             >
               {isLoading ? (
                 <Loader2 className="animate-spin h-5 w-5 text-white" />
@@ -211,22 +242,6 @@ export default function HomePage() {
               )}
             </Button>
           </div>
-          {isLoading && (
-            <div className="flex justify-start items-center mt-2 pl-2">
-              <Avatar className="h-6 w-6 mr-2">
-                <AvatarImage
-                  src="/carbonito-avatar.png"
-                  alt="Carbonito Avatar"
-                />
-                <AvatarFallback className="bg-green-500 text-white text-xs">
-                  CB
-                </AvatarFallback>
-              </Avatar>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Carbonito está digitando...
-              </p>
-            </div>
-          )}
         </div>
 
         <span className="text-xs text-muted-foreground text-center px-4 pb-4">
