@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowRight, Loader2, User2, Leaf } from "lucide-react"; // Importando Leaf para o logo
+import { ArrowRight, Loader2, User2, Leaf, AlertTriangle } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 
 interface Message {
   id: string;
@@ -16,14 +18,13 @@ interface Message {
   text: string;
 }
 
-// Novo componente para a animação de digitação
 const TypingDots = () => {
   const [dots, setDots] = useState("");
 
   useEffect(() => {
     const interval = setInterval(() => {
       setDots((prev) => (prev.length < 3 ? prev + "." : ""));
-    }, 300); // Muda a cada 300ms
+    }, 300);
     return () => clearInterval(interval);
   }, []);
 
@@ -42,13 +43,14 @@ export default function HomePage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (input.trim() === "") return;
+  const handleSendMessage = async (customInput?: string) => {
+    const messageText = customInput ?? input.trim();
+    if (messageText === "") return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       sender: "user",
-      text: input.trim(),
+      text: messageText,
     };
 
     setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -62,7 +64,7 @@ export default function HomePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ question: userMessage.text }),
+        body: JSON.stringify({ question: messageText }),
       });
 
       if (!response.ok) {
@@ -80,7 +82,6 @@ export default function HomePage() {
       };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error: unknown) {
-      // Corrigido: 'any' para 'unknown'
       console.error("Erro ao enviar mensagem para a API:", error);
       let errorMessageText =
         "Desculpe, houve um erro desconhecido ao processar sua solicitação.";
@@ -109,46 +110,80 @@ export default function HomePage() {
     }
   };
 
-  return (
-    <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Cabeçalho Fixo */}
-      <header className="flex h-16 items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-          <Leaf className="h-6 w-6 text-lime-600" /> Carbonito
-        </h1>
-      </header>
+  const handleQuestionBtnClick = (question: string) => {
+    handleSendMessage(question);
+  };
 
-      {/* Separator sob o cabeçalho (opcional, para visual) */}
-      <Separator className="bg-gray-200 dark:bg-gray-700" />
+  return (
+    <div className="flex flex-col h-screen ">
+      {/* Cabeçalho Fixo */}
+      <header className="flex h-16 items-center justify-between px-4 py-2">
+        <h1 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+          <Leaf className="size-6 text-lime-600" /> Carbonito
+        </h1>
+
+        <ModeToggle />
+      </header>
 
       {/* Área de Mensagens - Conteúdo principal que rola */}
       <main className="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full">
         <div className="space-y-6">
           {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-[calc(100vh-16rem)] text-gray-500 dark:text-gray-400 text-center px-4">
-              <p className="text-lg font-medium text-balance">
-                Olá! Sou o <b>Carbonito</b>, seu especialista em legislação
-                ambiental, Pantanal e mercado de carbono.
-              </p>
-              <p className="text-md mt-4">Como posso te ajudar hoje?</p>
-              <div className="mt-6 space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  O que é carbono e por que estão pagando por isso?
-                </p>
-                <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  Sou produtor, e agora? Posso entrar nesse mercado?
-                </p>
-                <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  O Pantanal vale mais preservado?
-                </p>
+            <div className="flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] text-gray-500 dark:text-gray-400 text-center px-4 py-8">
+              <div className="size-12 text-lime-600 bg-lime-600/20 flex items-center justify-center rounded-full mb-4">
+                <Leaf />
               </div>
 
-              <p className="text-sm mt-8 text-red-500 dark:text-red-400 font-medium">
-                🚨
-                <br /> O Carbonito pode errar em suas respostas, pois às vezes
-                acaba a água do seu tereré. Por isso, é bom checar as respostas
-                em outra fonte.
+              <p className="text-lg font-medium text-balance">
+                Olá! Sou o <b className="text-lime-600">Carbonito</b>, seu
+                especialista em legislação ambiental, Pantanal e mercado de
+                carbono.
               </p>
+
+              <p className="text-md mt-8 mb-2">Como posso te ajudar?</p>
+              <div className="flex gap-2 flex-wrap items-center justify-center text-sm  ">
+                <button
+                  type="button"
+                  className="border p-2 rounded-md bg-muted text-muted-foreground"
+                  onClick={() =>
+                    handleQuestionBtnClick(
+                      "O que é carbono e por que estão pagando por isso?"
+                    )
+                  }
+                >
+                  O que é carbono e por que estão pagando por isso?
+                </button>
+                <button
+                  type="button"
+                  className="border p-2 rounded-md bg-muted text-muted-foreground"
+                  onClick={() =>
+                    handleQuestionBtnClick(
+                      "Sou produtor, e agora? Posso entrar nesse mercado?"
+                    )
+                  }
+                >
+                  Sou produtor, e agora? Posso entrar nesse mercado?
+                </button>
+                <button
+                  type="button"
+                  className="border p-2 rounded-md bg-muted text-muted-foreground"
+                  onClick={() =>
+                    handleQuestionBtnClick("O Pantanal vale mais preservado?")
+                  }
+                >
+                  O Pantanal vale mais preservado?
+                </button>
+              </div>
+
+              <Alert variant="destructive" className="text-left mt-8">
+                <AlertTriangle />
+
+                <AlertDescription>
+                  O Carbonito pode errar em suas respostas, pois às vezes acaba
+                  a água do seu tereré. Sendo assim, é bom checar as respostas
+                  desta página em outra fonte.
+                </AlertDescription>
+              </Alert>
             </div>
           ) : (
             messages.map((message) => (
@@ -164,20 +199,20 @@ export default function HomePage() {
                       src="/carbonito-avatar.png"
                       alt="Carbonito Avatar"
                     />
-                    <AvatarFallback className="bg-lime-800 text-white">
-                      <Leaf />
+                    <AvatarFallback className="bg-lime-600/20 text-lime-600">
+                      <Leaf className="size-4" />
                     </AvatarFallback>
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-[70%] p-4 rounded-xl shadow-sm ${
+                  className={`max-w-[70%] p-4 rounded-xl shadow-sm text-sm ${
                     message.sender === "user"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-lime-600 text-white"
                       : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white prose dark:prose-invert"
                   }`}
                 >
                   {message.sender === "user" ? (
-                    <p className="text-base leading-relaxed">{message.text}</p>
+                    <p>{message.text}</p>
                   ) : (
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {message.text}
@@ -187,8 +222,8 @@ export default function HomePage() {
                 {message.sender === "user" && (
                   <Avatar className="size-8 flex-shrink-0">
                     <AvatarImage src="/user-avatar.png" alt="User Avatar" />
-                    <AvatarFallback className="bg-muted text-muted-foreground border">
-                      <User2 className="size-4" /> {/* Ícone User2 do Lucide */}
+                    <AvatarFallback className="bg-muted text-muted-foreground">
+                      <User2 className="size-4" />
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -203,11 +238,11 @@ export default function HomePage() {
                   src="/carbonito-avatar.png"
                   alt="Carbonito Avatar"
                 />
-                <AvatarFallback className="bg-lime-800 text-white text-xs">
-                  <Leaf className="size-4" />
+                <AvatarFallback className="bg-lime-600/20 text-lime-600">
+                  <Leaf className="size-3" />
                 </AvatarFallback>
               </Avatar>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400 animate-pulse">
                 Carbonito está digitando
                 <TypingDots />
               </p>
@@ -233,7 +268,7 @@ export default function HomePage() {
               onClick={handleSendMessage}
               disabled={isLoading || input.trim() === ""}
               size="icon"
-              className="absolute right-4 bottom-3 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+              className="absolute right-4 bottom-3  bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600"
             >
               {isLoading ? (
                 <Loader2 className="animate-spin h-5 w-5 text-white" />
@@ -244,8 +279,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        <span className="text-xs text-muted-foreground text-center px-4 pb-4">
+        <span className="text-xs text-muted-foreground text-center px-4 pb-4 text-balance">
           O Carbonito pode cometer erros. Por isso, é bom checar as respostas.
+          Feito no curso de Direito da UEMS de Aquidauana
         </span>
       </div>
     </div>
