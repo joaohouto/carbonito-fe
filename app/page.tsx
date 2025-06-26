@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowRight, Loader2, User2 } from "lucide-react";
+import { ArrowRight, Loader2, User2, Leaf } from "lucide-react"; // Importando Leaf para o logo
 
 interface Message {
   id: string;
@@ -65,12 +65,22 @@ export default function HomePage() {
         text: botResponseText,
       };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      // Corrigido: 'any' para 'unknown'
       console.error("Erro ao enviar mensagem para a API:", error);
+      let errorMessageText =
+        "Desculpe, houve um erro desconhecido ao processar sua solicitação.";
+
+      if (error instanceof Error) {
+        errorMessageText = `Desculpe, houve um erro ao processar sua solicitação: ${error.message}. Por favor, tente novamente.`;
+      } else if (typeof error === "string") {
+        errorMessageText = `Desculpe, houve um erro ao processar sua solicitação: ${error}. Por favor, tente novamente.`;
+      }
+
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
         sender: "bot",
-        text: `Desculpe, houve um erro ao processar sua solicitação: ${error.message}. Por favor, tente novamente.`,
+        text: errorMessageText,
       };
       setMessages((prevMessages) => [...prevMessages, errorMessage]);
     } finally {
@@ -88,9 +98,9 @@ export default function HomePage() {
   return (
     <div className="flex flex-col h-screen bg-gray-50 dark:bg-gray-900">
       {/* Cabeçalho Fixo */}
-      <header className="flex h-16 items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 border-b border">
-        <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
-          Carbonito
+      <header className="flex h-16 items-center justify-between px-4 py-2 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+        <h1 className="text-xl font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+          <Leaf className="h-6 w-6 text-green-600" /> Carbonito
         </h1>
       </header>
 
@@ -103,29 +113,26 @@ export default function HomePage() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-[calc(100vh-16rem)] text-gray-500 dark:text-gray-400 text-center px-4">
               <p className="text-lg font-medium">
-                Olá! Sou o <b>Carbonito</b>, seu especialista em legislação
-                ambiental, Pantanal e mercado de carbono.
+                Olá! Sou o **Carbonito**, seu especialista em **legislação
+                ambiental**, **Pantanal** e **mercado de carbono**.
               </p>
-
               <p className="text-md mt-4">Como posso te ajudar hoje?</p>
               <div className="mt-6 space-y-2 text-sm text-gray-600 dark:text-gray-400">
                 <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  "Quais são as últimas leis sobre desmatamento no Pantanal?"
+                  Quais são as últimas leis sobre desmatamento no Pantanal?
                 </p>
                 <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  "Explique o conceito de créditos de carbono no agronegócio."
+                  Explique o conceito de créditos de carbono no agronegócio.
                 </p>
                 <p className="border p-2 rounded-md bg-gray-100 dark:bg-gray-700">
-                  "Como a PEC da Transição Ecológica impacta empresas?"
+                  Como a PEC da Transição Ecológica impacta empresas?
                 </p>
               </div>
 
-              <div className=""></div>
-
-              <p className="text-sm mt-2 text-muted-foreground">
-                O Carbonito pode errar em suas respostas, pois às vezes acaba a
-                água do seu tereré. Por isso, é bom checar as respostas em outra
-                fonte.
+              <p className="text-sm mt-8 text-red-500 dark:text-red-400 font-medium">
+                🚨 Aviso: O Carbonito pode errar em suas respostas, pois às
+                vezes acaba a água do seu tereré. Por isso, é bom checar as
+                respostas em outra fonte.
               </p>
             </div>
           ) : (
@@ -150,7 +157,7 @@ export default function HomePage() {
                 <div
                   className={`max-w-[70%] p-4 rounded-xl shadow-sm ${
                     message.sender === "user"
-                      ? "bg-primary text-white"
+                      ? "bg-blue-600 text-white" // Mudado de 'bg-primary' para 'bg-blue-600' para clareza Tailwind
                       : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white prose dark:prose-invert"
                   }`}
                 >
@@ -166,7 +173,7 @@ export default function HomePage() {
                   <Avatar className="size-8 flex-shrink-0">
                     <AvatarImage src="/user-avatar.png" alt="User Avatar" />
                     <AvatarFallback className="bg-muted text-muted-foreground border">
-                      <User2 className="size-4" />
+                      <User2 className="size-4" /> {/* Ícone User2 do Lucide */}
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -179,7 +186,9 @@ export default function HomePage() {
 
       {/* Área de Input Fixa na parte inferior */}
       <div className="flex flex-col items-center relative w-full border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-        <div className="mx-auto w-full md:w-3xl px-4 py-4 sm:px-6 md:py-6">
+        <div className="mx-auto w-full max-w-3xl px-4 py-4 sm:px-6 md:py-6">
+          {" "}
+          {/* Corrigido: md:w-3xl para max-w-3xl */}
           <div className="relative flex items-center w-full">
             <Textarea
               placeholder="Pergunte ao Carbonito..."
@@ -193,12 +202,12 @@ export default function HomePage() {
               onClick={handleSendMessage}
               disabled={isLoading || input.trim() === ""}
               size="icon"
-              className="absolute right-4 bottom-3 rounded-full"
+              className="absolute right-4 bottom-3 rounded-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" // Adicionei cores explícitas para o botão
             >
               {isLoading ? (
-                <Loader2 className="animate-spin" />
+                <Loader2 className="animate-spin h-5 w-5 text-white" />
               ) : (
-                <ArrowRight />
+                <ArrowRight className="h-5 w-5 text-white" />
               )}
             </Button>
           </div>
@@ -221,7 +230,7 @@ export default function HomePage() {
         </div>
 
         <span className="text-xs text-muted-foreground text-center px-4 pb-4">
-          O Carbonito pode cometer erros. Por isso, é bom checar as respostas
+          O Carbonito pode cometer erros. Por isso, é bom checar as respostas.
         </span>
       </div>
     </div>
