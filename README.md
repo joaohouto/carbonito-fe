@@ -10,6 +10,8 @@ Este projeto foi desenvolvido no curso de **Direito da UEMS — Unidade de Aquid
 A API que alimenta esse front está disponível aqui:
 [https://github.com/joaohouto/carbonito-api](https://github.com/joaohouto/carbonito-api)
 
+![Preview](/public/og.png)
+
 ## 🛠️ Como rodar localmente
 
 ```bash

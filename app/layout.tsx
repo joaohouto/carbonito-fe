@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "Carbonito — Mercado de Carbono no Pantanal",
   description:
     "Converse com o Carbonito, o chatbot criado pelos alunos de Direito da UEMS para o Pantanal Tech 2025. Especializado em legislação ambiental, mercado de carbono e oportunidades para o agronegócio no Pantanal e Brasil.",
+  openGraph: {
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({

@@ -261,13 +261,13 @@ export default function HomePage() {
                 </button>
               </div>
 
-              <Alert variant="destructive" className="text-left mt-8">
+              <Alert className="text-left mt-8 text-amber-600">
                 <AlertTriangle />
 
-                <AlertDescription>
-                  O Carbonito pode errar em suas respostas, pois às vezes acaba
-                  a água do seu tereré. Sendo assim, é bom checar as respostas
-                  desta página em outra fonte.
+                <AlertDescription className="text-amber-600">
+                  O Carbonito pode errar nas respostas, porque às vezes acaba a
+                  água do seu tereré. Então, é bom checar as informações desta
+                  página em outras fontes.
                 </AlertDescription>
               </Alert>
             </div>
