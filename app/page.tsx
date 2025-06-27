@@ -5,11 +5,50 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowRight, Loader2, User2, Leaf, AlertTriangle } from "lucide-react";
+import {
+  ArrowRight,
+  Loader2,
+  User2,
+  Leaf,
+  AlertTriangle,
+  Github,
+  Info,
+  Code2,
+} from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
+import Markdown from "react-markdown";
+
+const ABOUT = `## 🌿 Sobre o Projeto Carbonito
+
+Este projeto foi desenvolvido pelos alunos do curso de **Direito** da **UEMS — Universidade Estadual de Mato Grosso do Sul, unidade de Aquidauana**, para o **Pantanal Tech 2025**.
+
+Nosso objetivo é aproximar produtores rurais, estudantes e o público em geral do tema **Mercado de Carbono** e da legislação ambiental brasileira, com foco especial no **Pantanal**.
+
+### 💡 Como funciona:
+
+1. Você faz uma pergunta sobre **carbono, legislação ambiental ou o Pantanal**.
+2. O chatbot **Carbonito** busca informações em documentos oficiais, leis e pesquisas locais.
+3. Ele responde de forma acessível e responsável.
+
+### 📦 Open Source
+
+Este projeto é **100% open source**. Acreditamos no conhecimento aberto como ferramenta de transformação social e acadêmica.
+
+---
+
+**⚠️ Obs.:** As respostas do Carbonito são baseadas em documentos de referência e podem conter limitações. Consulte sempre um profissional especializado para decisões jurídicas.
+`;
 
 interface Message {
   id: string;
@@ -121,12 +160,60 @@ export default function HomePage() {
           <Leaf className="size-6 text-lime-600" /> Carbonito
         </h1>
 
-        <ModeToggle />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              Sobre o projeto
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="w-full md:max-w-2xl text-left">
+            <DialogHeader className="w-full">
+              <DialogTitle className="hidden">Sobre o Carbonito</DialogTitle>
+              <DialogDescription className="prose dark:prose-invert w-full text-left">
+                <ReactMarkdown>{ABOUT}</ReactMarkdown>
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col md:flex-row gap-4 mt-6">
+              <Button variant="secondary" asChild className="gap-2">
+                <a
+                  href="https://github.com/joaohouto/carbonito-api"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Github className="w-4 h-4" />
+                  API no GitHub
+                </a>
+              </Button>
+
+              <Button variant="secondary" asChild className="gap-2">
+                <a
+                  href="https://github.com/joaohouto/carbonito-fe"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Github className="w-4 h-4" />
+                  Front-end no GitHub
+                </a>
+              </Button>
+            </div>
+
+            <a
+              href="https://joaocouto.com"
+              target="_blank"
+              className="text-sm flex justify-start items-center gap-1"
+            >
+              <Code2 className="size-4" />
+              joaocouto.com
+            </a>
+          </DialogContent>
+        </Dialog>
       </header>
 
       {/* Área de Mensagens - Conteúdo principal que rola */}
-      <main className="flex-1 overflow-y-auto p-4 max-w-3xl mx-auto w-full">
-        <div className="space-y-6">
+      <main className="flex-1 overflow-y-auto p-4 w-full">
+        <div className="space-y-6 max-w-3xl mx-auto">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-16rem)] text-gray-500 dark:text-gray-400 text-center px-4 py-8">
               <div className="size-12 text-lime-600 bg-lime-600/20 flex items-center justify-center rounded-full mb-4">
@@ -150,7 +237,7 @@ export default function HomePage() {
                     )
                   }
                 >
-                  O que é carbono e por que estão pagando por isso?
+                  💰 O que é carbono e por que estão pagando por isso?
                 </button>
                 <button
                   type="button"
@@ -161,7 +248,7 @@ export default function HomePage() {
                     )
                   }
                 >
-                  Sou produtor, e agora? Posso entrar nesse mercado?
+                  🚜 Sou produtor, e agora? Posso entrar nesse mercado?
                 </button>
                 <button
                   type="button"
@@ -170,7 +257,7 @@ export default function HomePage() {
                     handleQuestionBtnClick("O Pantanal vale mais preservado?")
                   }
                 >
-                  O Pantanal vale mais preservado?
+                  🌿 O Pantanal vale mais preservado?
                 </button>
               </div>
 
@@ -204,7 +291,7 @@ export default function HomePage() {
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-[70%] p-4 rounded-xl shadow-sm text-sm ${
+                  className={`max-w-[70%] p-4 rounded-xl shadow-sm text-sm md:text-md ${
                     message.sender === "user"
                       ? "bg-lime-600 text-white"
                       : "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white prose dark:prose-invert"
@@ -280,7 +367,7 @@ export default function HomePage() {
 
         <span className="text-xs text-muted-foreground text-center px-4 pb-4 text-balance">
           O Carbonito pode cometer erros. Por isso, é bom checar as respostas.
-          Feito no curso de Direito da UEMS de Aquidauana
+          Feito no curso de Direito - UEMS/Aquidauana
         </span>
       </div>
     </div>
